@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flipside — Depop seller workspace</title>
+<meta name="description" content="A local-first workspace for Depop sellers: listing drafter, photo prep, profit tracking and niche research. Everything stays in your browser.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230c0d10'/%3E%3Cpath d='M9 23V9h8.5a4.75 4.75 0 0 1 0 9.5H13' fill='none' stroke='%23f0a950' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app" hidden>
+  <aside id="sidebar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="30" height="30"><rect width="32" height="32" rx="8" fill="#15171d"/><path d="M9 23V9h8.5a4.75 4.75 0 0 1 0 9.5H13" fill="none" stroke="#f0a950" stroke-width="2.6" stroke-linecap="round"/></svg>
+      </span>
+      <span class="brand-word">FLIPSIDE</span>
+    </div>
+    <nav class="side-nav" aria-label="Main">
+      <a href="#/board" data-nav="board"><svg viewBox="0 0 20 20"><path d="M3 10.5 10 4l7 6.5M5 9.5V16h4v-3.5h2V16h4V9.5"/></svg><span>Board</span></a>
+      <a href="#/listings" data-nav="listings"><svg viewBox="0 0 20 20"><path d="M4 4h7l5 5v7H4zM11 4v5h5M7 12h6M7 15h4"/></svg><span>Listings</span><em class="badge" id="nav-listing-count" hidden></em></a>
+      <a href="#/photos" data-nav="photos"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><circle cx="7.5" cy="8.5" r="1.4"/><path d="m5 15 4-4 3 3 2-2 1 1"/></svg><span>Photos</span></a>
+      <a href="#/orders" data-nav="orders"><svg viewBox="0 0 20 20"><path d="M4 6h12v10H4zM4 9h12M8 13h3"/></svg><span>Orders</span><em class="badge" id="nav-order-count" hidden></em></a>
+      <a href="#/niche" data-nav="niche"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5"/><circle cx="10" cy="10" r="2.5"/><path d="M10 1.5v3M10 15.5v3M1.5 10h3M15.5 10h3"/></svg><span>Niche lab</span></a>
+      <a href="#/settings" data-nav="settings"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="2.6"/><path d="M10 2.8v2.2M10 15v2.2M2.8 10h2.2M15 10h2.2M5 5l1.6 1.6M13.4 13.4 15 15M15 5l-1.6 1.6M6.6 13.4 5 15"/></svg><span>Settings</span></a>
+    </nav>
+    <div class="side-foot">
+      <div class="vault-chip" id="vault-chip" title="Storage mode"></div>
+      <button class="btn ghost sm" id="btn-lock-side" type="button">Lock</button>
+    </div>
+  </aside>
+
+  <main id="main">
+    <header id="topbar">
+      <div>
+        <h1 id="view-title">Board</h1>
+        <p id="view-sub" class="muted"></p>
+      </div>
+      <div class="top-actions">
+        <span class="vault-chip" id="vault-chip-top"></span>
+        <button class="btn ghost sm" id="btn-lock-top" type="button">Lock</button>
+      </div>
+    </header>
+
+    <!-- ============ BOARD ============ -->
+    <section id="view-board" class="view">
+      <div class="empty-hero" id="board-empty" hidden>
+        <h2>Your reseller back office.</h2>
+        <p>Draft listings that sound like you, prep square photos, and see what you actually keep after fees — all in this browser, nothing on a server.</p>
+        <div class="hero-actions">
+          <button class="btn primary" id="hero-add-order" type="button">Log your first sale</button>
+          <button class="btn ghost" id="hero-sample" type="button">Try it with sample data</button>
+        </div>
+        <p class="fine muted">Sample data is made up and wipes with one click in Settings.</p>
+      </div>
+
+      <div id="board-content">
+        <div class="stat-grid" id="stat-grid"></div>
+        <div class="panel-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Profit, last 14 days</h3>
+              <span class="muted sm" id="chart-total"></span>
+            </div>
+            <canvas id="chart-14" height="180"></canvas>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Today's goal</h3>
+              <button class="btn ghost sm" id="btn-edit-goal" type="button">Edit</button>
+            </div>
+            <div class="goal-wrap">
+              <canvas id="goal-ring" width="140" height="140"></canvas>
+              <div class="goal-copy" id="goal-copy"></div>
+            </div>
+            <div class="panel-head" style="margin-top:18px"><h3>Recent sales</h3></div>
+            <div id="recent-orders" class="mini-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LISTINGS ============ -->
+    <section id="view-listings" class="view" hidden>
+      <div class="split">
+        <div class="split-side">
+          <button class="btn primary block" id="btn-new-listing" type="button">+ New listing</button>
+          <div id="listing-list" class="card-list"></div>
+        </div>
+        <div class="split-main" id="listing-editor-wrap">
+          <div class="empty-note" id="listing-empty">
+            <p>No listing open. Start a new one — the drafter writes your title, description and hashtags from the details you give it.</p>
+          </div>
+          <div id="listing-editor" hidden>
+            <div class="form-grid">
+              <label class="field span2"><span>Item name</span>
+                <input id="li-name" type="text" placeholder="Carhartt detroit jacket" autocomplete="off">
+              </label>
+              <label class="field"><span>Brand</span>
+                <input id="li-brand" type="text" placeholder="Carhartt" autocomplete="off">
+              </label>
+              <label class="field"><span>Category</span>
+                <select id="li-category"></select>
+              </label>
+              <label class="field"><span>Size</span>
+                <input id="li-size" type="text" placeholder="M / 32 / UK 8" autocomplete="off">
+              </label>
+              <label class="field"><span>Colour</span>
+                <input id="li-color" type="text" placeholder="faded black" autocomplete="off">
+              </label>
+              <label class="field"><span>Condition</span>
+                <select id="li-condition"></select>
+              </label>
+              <label class="field"><span>Era / style <em class="opt">optional</em></span>
+                <input id="li-era" type="text" placeholder="90s, Y2K, workwear" autocomplete="off">
+              </label>
+              <label class="field span2"><span>Flaws to disclose <em class="opt">optional</em></span>
+                <input id="li-flaws" type="text" placeholder="small fade on left cuff, shown in photo 4" autocomplete="off">
+              </label>
+              <label class="field"><span>Measurements <em class="opt">optional</em></span>
+                <input id="li-measure" type="text" placeholder="pit to pit 22in, length 26in" autocomplete="off">
+              </label>
+              <label class="field"><span>Style tags <em class="opt">comma separated</em></span>
+                <input id="li-tags" type="text" placeholder="vintage, workwear, 90s" autocomplete="off">
+              </label>
+              <label class="field"><span>Your cost</span>
+                <input id="li-cost" type="number" min="0" step="0.01" placeholder="8.00" inputmode="decimal">
+              </label>
+              <label class="field"><span>Asking price</span>
+                <input id="li-price" type="number" min="0" step="0.01" placeholder="45.00" inputmode="decimal">
+              </label>
+            </div>
+            <p class="takehome" id="li-takehome"></p>
+            <div class="row-actions">
+              <button class="btn primary" id="btn-generate" type="button">Write my listing</button>
+              <label class="inline-select">Tone
+                <select id="li-tone">
+                  <option value="classic">Classic Depop</option>
+                  <option value="clean">Clean + simple</option>
+                  <option value="minimal">Minimal</option>
+                </select>
+              </label>
+            </div>
+            <div id="listing-output" hidden>
+              <div class="out-block">
+                <div class="out-head"><h4>Title</h4><span class="muted sm" id="out-title-len"></span>
+                  <button class="btn ghost sm copy" data-copy="out-title" type="button">Copy</button></div>
+                <p id="out-title" class="out-text"></p>
+              </div>
+              <div class="out-block">
+                <div class="out-head"><h4>Description</h4>
+                  <button class="btn ghost sm copy" data-copy="out-desc" type="button">Copy</button></div>
+                <pre id="out-desc" class="out-text"></pre>
+              </div>
+              <div class="out-block">
+                <div class="out-head"><h4>Hashtags</h4><span class="muted sm" id="out-tag-len"></span>
+                  <button class="btn ghost sm copy" data-copy="out-tags" type="button">Copy</button></div>
+                <p id="out-tags" class="out-text"></p>
+              </div>
+              <div class="row-actions">
+                <button class="btn primary" id="btn-copy-all" type="button">Copy everything</button>
+                <button class="btn ok" id="btn-mark-listed" type="button">Mark as listed</button>
+                <button class="btn ghost" id="btn-mark-sold" type="button">Mark sold → log sale</button>
+              </div>
+            </div>
+            <div class="row-actions danger-zone">
+              <button class="btn danger sm" id="btn-del-listing" type="button">Delete this listing</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PHOTOS ============ -->
+    <section id="view-photos" class="view" hidden>
+      <div class="photos-top">
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Add photos">
+          <svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 16V5m0 0-4 4m4-4 4 4M4 19h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <p><strong>Drop photos here</strong> or click to browse</p>
+          <p class="muted sm">They never leave this device. Nothing uploads anywhere.</p>
+        </div>
+        <div class="thumb-strip" id="thumb-strip"></div>
+      </div>
+      <div id="photo-editor" hidden>
+        <div class="editor-grid">
+          <div class="canvas-wrap">
+            <canvas id="edit-canvas"></canvas>
+            <p class="muted sm" id="canvas-hint"></p>
+          </div>
+          <div class="tool-col">
+            <div class="tool-group">
+              <h4>Square for Depop</h4>
+              <div class="seg" id="fit-seg">
+                <button data-fit="fill" class="on" type="button">Fill crop</button>
+                <button data-fit="blur" type="button">Blur pad</button>
+                <button data-fit="color" type="button">Colour pad</button>
+              </div>
+              <label class="inline-color" id="pad-color-row" hidden>Pad colour <input type="color" id="pad-color" value="#f4f1ea"></label>
+              <div class="row-actions">
+                <button class="btn ghost sm" id="btn-rotate" type="button">Rotate 90°</button>
+              </div>
+            </div>
+            <div class="tool-group">
+              <h4>Light + colour</h4>
+              <label class="slider"><span>Brightness</span><input type="range" id="adj-bright" min="-60" max="60" value="0"><b>0</b></label>
+              <label class="slider"><span>Contrast</span><input type="range" id="adj-contrast" min="-60" max="60" value="0"><b>0</b></label>
+              <label class="slider"><span>Saturation</span><input type="range" id="adj-sat" min="-80" max="80" value="0"><b>0</b></label>
+              <label class="slider"><span>Warmth</span><input type="range" id="adj-warm" min="-40" max="40" value="0"><b>0</b></label>
+            </div>
+            <div class="tool-group">
+              <h4>Background remover</h4>
+              <p class="muted sm">Picks up plain backdrops (walls, floors, sheets). Sample a corner of the backdrop, tune tolerance, then erase or restore by hand.</p>
+              <div class="row-actions">
+                <button class="btn ghost sm" id="btn-bg-auto" type="button">Remove backdrop</button>
+                <button class="btn ghost sm" id="btn-bg-reset" type="button">Undo removal</button>
+              </div>
+              <label class="slider"><span>Tolerance</span><input type="range" id="bg-tol" min="4" max="80" value="26"><b>26</b></label>
+              <div class="seg" id="brush-seg">
+                <button data-brush="off" class="on" type="button">Brush off</button>
+                <button data-brush="erase" type="button">Erase</button>
+                <button data-brush="restore" type="button">Restore</button>
+              </div>
+              <label class="slider"><span>Brush size</span><input type="range" id="brush-size" min="8" max="120" value="44"><b>44</b></label>
+            </div>
+            <div class="tool-group">
+              <h4>Export</h4>
+              <div class="seg" id="fmt-seg">
+                <button data-fmt="jpeg" class="on" type="button">JPG</button>
+                <button data-fmt="png" type="button">PNG</button>
+              </div>
+              <button class="btn primary block" id="btn-export" type="button">Download 1280×1280</button>
+              <button class="btn ghost block" id="btn-export-all" type="button">Square-export all photos</button>
+              <p class="muted sm" id="export-status"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ORDERS ============ -->
+    <section id="view-orders" class="view" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <h3 id="order-form-title">Log a sale</h3>
+          <button class="btn ghost sm" id="btn-order-cancel" type="button" hidden>Cancel edit</button>
+        </div>
+        <div class="form-grid">
+          <label class="field span2"><span>Item</span>
+            <input id="or-item" type="text" list="listing-names" placeholder="What sold?" autocomplete="off">
+            <datalist id="listing-names"></datalist>
+          </label>
+          <label class="field"><span>Date</span><input id="or-date" type="date"></label>
+          <label class="field"><span>Sold for</span><input id="or-price" type="number" min="0" step="0.01" placeholder="45.00" inputmode="decimal"></label>
+          <label class="field"><span>Shipping buyer paid</span><input id="or-ship-charged" type="number" min="0" step="0.01" placeholder="4.50" inputmode="decimal"></label>
+          <label class="field"><span>Shipping cost to you</span><input id="or-ship-cost" type="number" min="0" step="0.01" placeholder="3.80" inputmode="decimal"></label>
+          <label class="field"><span>Item cost to you</span><input id="or-cost" type="number" min="0" step="0.01" placeholder="8.00" inputmode="decimal"></label>
+          <label class="field"><span>Notes <em class="opt">optional</em></span><input id="or-notes" type="text" placeholder="bundle, repeat buyer…" autocomplete="off"></label>
+        </div>
+        <p class="takehome" id="or-preview"></p>
+        <div class="row-actions">
+          <button class="btn primary" id="btn-save-order" type="button">Save sale</button>
+          <span class="muted sm" id="or-fee-note"></span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Sales</h3>
+          <div class="row-actions" style="margin:0">
+            <span class="muted sm" id="order-totals"></span>
+            <button class="btn ghost sm" id="btn-export-csv" type="button">Export CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="order-table">
+            <thead><tr><th>Date</th><th>Item</th><th class="num">Sold</th><th class="num">Fees</th><th class="num">Ship −/+</th><th class="num">Cost</th><th class="num">Profit</th><th class="num">Margin</th><th></th></tr></thead>
+            <tbody id="order-tbody"></tbody>
+          </table>
+          <p class="empty-note" id="orders-empty">No sales logged yet. Your real profit per sale — after Depop's processing fee, shipping and what the item cost you — shows up here.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NICHE ============ -->
+    <section id="view-niche" class="view" hidden>
+      <div class="panel-grid niche-grid">
+        <div class="panel">
+          <div class="panel-head"><h3>Launch checklist</h3><span class="muted sm" id="check-progress"></span></div>
+          <p class="muted sm">The workflow, in order. Tick things off as you go — it saves on this device.</p>
+          <div id="checklist"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Niche scorecard</h3></div>
+          <p class="muted sm">Score a niche before you sink money into it. Be honest — a pretty score on a niche you can't source is worse than none.</p>
+          <div class="form-grid">
+            <label class="field span2"><span>Niche name</span><input id="ni-name" type="text" placeholder="90s workwear jackets" autocomplete="off"></label>
+          </div>
+          <label class="slider big"><span>Demand <em>are sold listings moving?</em></span><input type="range" id="ni-demand" min="1" max="10" value="5"><b>5</b></label>
+          <label class="slider big"><span>Room <em>not drowned in identical listings?</em></span><input type="range" id="ni-room" min="1" max="10" value="5"><b>5</b></label>
+          <label class="slider big"><span>Margin <em>sold price vs what you pay?</em></span><input type="range" id="ni-margin" min="1" max="10" value="5"><b>5</b></label>
+          <label class="slider big"><span>Sourcing <em>can you actually find it cheap, repeatedly?</em></span><input type="range" id="ni-source" min="1" max="10" value="5"><b>5</b></label>
+          <label class="slider big"><span>Knowledge <em>can you spot fakes + grails?</em></span><input type="range" id="ni-know" min="1" max="10" value="5"><b>5</b></label>
+          <div class="score-read"><div class="score-num" id="ni-score">50</div><div class="score-verdict" id="ni-verdict"></div></div>
+          <div class="row-actions"><button class="btn primary" id="btn-save-niche" type="button">Save scorecard</button></div>
+          <div id="niche-list" class="card-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section id="view-settings" class="view" hidden>
+      <div class="panel-grid niche-grid">
+        <div>
+          <div class="panel">
+            <div class="panel-head"><h3>Fees + currency</h3></div>
+            <p class="muted sm">Depop charges no selling fee in the US, UK and Australia — you only pay payment processing. Elsewhere a 10% selling fee still applies. Rates checked Sep 2026; confirm on Depop's help page if a number looks off.</p>
+            <div class="form-grid">
+              <label class="field"><span>Where you sell</span>
+                <select id="set-fee-preset">
+                  <option value="us">United States — 3.3% + $0.45</option>
+                  <option value="uk">United Kingdom — 2.9% + £0.30</option>
+                  <option value="au">Australia — 2.9% + A$0.30</option>
+                  <option value="row">Rest of world — 10% + processing</option>
+                  <option value="custom">Custom rates</option>
+                </select>
+              </label>
+              <label class="field"><span>Currency</span>
+                <select id="set-currency">
+                  <option value="USD">$ USD</option><option value="GBP">£ GBP</option>
+                  <option value="EUR">€ EUR</option><option value="AUD">A$ AUD</option>
+                  <option value="INR">₹ INR</option>
+                </select>
+              </label>
+              <div id="custom-fees" hidden>
+                <label class="field"><span>Fee %</span><input id="set-fee-pct" type="number" min="0" step="0.1"></label>
+                <label class="field"><span>Fixed fee</span><input id="set-fee-fixed" type="number" min="0" step="0.01"></label>
+              </div>
+              <label class="field"><span>Daily profit goal</span><input id="set-goal" type="number" min="0" step="1"></label>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Your data</h3></div>
+            <p class="muted sm" id="data-explainer"></p>
+            <div class="row-actions wrap">
+              <button class="btn ghost" id="btn-export-data" type="button">Download backup</button>
+              <button class="btn ghost" id="btn-import-data" type="button">Restore backup</button>
+              <button class="btn danger" id="btn-wipe" type="button">Wipe everything</button>
+            </div>
+            <input type="file" id="import-file" accept="application/json,.json" hidden>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Vault + privacy</h3></div>
+          <div id="vault-setup">
+            <p class="muted sm">Right now nothing is stored when you close this tab. Set a passphrase and Flipside keeps your data on <strong>this device only</strong>, encrypted with AES-GCM — the same class of encryption banks use. The passphrase never leaves your browser, and there is no account to hack because there is no server.</p>
+            <div class="form-grid">
+              <label class="field span2"><span>Passphrase</span><input id="set-pass-1" type="password" autocomplete="new-password" placeholder="at least 8 characters"></label>
+              <label class="field span2"><span>Again</span><input id="set-pass-2" type="password" autocomplete="new-password" placeholder="same one more time"></label>
+            </div>
+            <div class="row-actions"><button class="btn primary" id="btn-set-pass" type="button">Start keeping my data</button></div>
+            <p class="fine muted">Forget the passphrase and the data is unrecoverable — that is the point of real encryption. Write it down somewhere safe.</p>
+          </div>
+          <div id="vault-manage" hidden>
+            <p class="muted sm">Your data is encrypted on this device with your passphrase. Flipside auto-locks after 10 minutes away from the page.</p>
+            <div class="row-actions wrap">
+              <button class="btn ghost" id="btn-lock-now" type="button">Lock now</button>
+              <button class="btn ghost" id="btn-change-pass" type="button">Change passphrase</button>
+              <button class="btn danger" id="btn-remove-vault" type="button">Stop storing + wipe</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="fine muted center" style="margin-top:26px">Flipside runs entirely in your browser. No accounts, no analytics, no server. It does not list, message or refresh anything on Depop for you — it prepares everything so listing takes minutes, and it shows what you actually keep.</p>
+    </section>
+  </main>
+
+  <nav id="tabbar" aria-label="Main">
+    <a href="#/board" data-nav="board"><svg viewBox="0 0 20 20"><path d="M3 10.5 10 4l7 6.5M5 9.5V16h4v-3.5h2V16h4V9.5"/></svg><span>Board</span></a>
+    <a href="#/listings" data-nav="listings"><svg viewBox="0 0 20 20"><path d="M4 4h7l5 5v7H4zM11 4v5h5M7 12h6M7 15h4"/></svg><span>List</span></a>
+    <a href="#/photos" data-nav="photos"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><circle cx="7.5" cy="8.5" r="1.4"/><path d="m5 15 4-4 3 3 2-2 1 1"/></svg><span>Photos</span></a>
+    <a href="#/orders" data-nav="orders"><svg viewBox="0 0 20 20"><path d="M4 6h12v10H4zM4 9h12M8 13h3"/></svg><span>Sales</span></a>
+    <a href="#/niche" data-nav="niche"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5"/><circle cx="10" cy="10" r="2.5"/></svg><span>Niche</span></a>
+  </nav>
+</div>
+
+<!-- Lock / welcome screen -->
+<div id="gate" hidden>
+  <div class="gate-card">
+    <div class="brand center-brand">
+      <span class="brand-mark"><svg viewBox="0 0 32 32" width="38" height="38"><rect width="32" height="32" rx="8" fill="#15171d"/><path d="M9 23V9h8.5a4.75 4.75 0 0 1 0 9.5H13" fill="none" stroke="#f0a950" stroke-width="2.6" stroke-linecap="round"/></svg></span>
+      <span class="brand-word">FLIPSIDE</span>
+    </div>
+    <p class="gate-tag" id="gate-tag">The Depop seller workspace that lives on your device, not on a server.</p>
+    <div id="gate-unlock" hidden>
+      <label class="field"><span>Passphrase</span><input id="gate-pass" type="password" autocomplete="current-password" placeholder="your passphrase"></label>
+      <button class="btn primary block" id="btn-unlock" type="button">Unlock</button>
+      <p class="fine muted" id="gate-error" role="alert"></p>
+    </div>
+    <div id="gate-fresh" hidden>
+      <button class="btn primary block" id="btn-fresh" type="button">Open my workspace</button>
+      <p class="fine muted">Nothing leaves this browser. Session-only until you set a passphrase in Settings.</p>
+    </div>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast-root" aria-live="polite"></div>
+<script src="app.js"></script>
+</body>
+</html>
