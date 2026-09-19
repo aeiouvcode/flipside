@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Flipside — Depop seller workspace</title>
+<title>Flipside - Depop seller workspace</title>
 <meta name="description" content="A local-first workspace for Depop sellers: listing drafter, photo prep, profit tracking and niche research. Everything stays in your browser.">
 <meta name="color-scheme" content="dark">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230c0d10'/%3E%3Cpath d='M9 23V9h8.5a4.75 4.75 0 0 1 0 9.5H13' fill='none' stroke='%23f0a950' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -48,7 +48,7 @@
     <section id="view-board" class="view">
       <div class="empty-hero" id="board-empty" hidden>
         <h2>Your reseller back office.</h2>
-        <p>Draft listings that sound like you, prep square photos, and see what you actually keep after fees — all in this browser, nothing on a server.</p>
+        <p>Draft listings that sound like you, prep square photos, and see what you actually keep after fees - all in this browser, nothing on a server.</p>
         <div class="hero-actions">
           <button class="btn primary" id="hero-add-order" type="button">Log your first sale</button>
           <button class="btn ghost" id="hero-sample" type="button">Try it with sample data</button>
@@ -91,7 +91,7 @@
         </div>
         <div class="split-main" id="listing-editor-wrap">
           <div class="empty-note" id="listing-empty">
-            <p>No listing open. Start a new one — the drafter writes your title, description and hashtags from the details you give it.</p>
+            <p>No listing open. Start a new one - the drafter writes your title, description and hashtags from the details you give it.</p>
           </div>
           <div id="listing-editor" hidden>
             <div class="form-grid">
@@ -277,7 +277,7 @@
             <thead><tr><th>Date</th><th>Item</th><th class="num">Sold</th><th class="num">Fees</th><th class="num">Ship −/+</th><th class="num">Cost</th><th class="num">Profit</th><th class="num">Margin</th><th></th></tr></thead>
             <tbody id="order-tbody"></tbody>
           </table>
-          <p class="empty-note" id="orders-empty">No sales logged yet. Your real profit per sale — after Depop's processing fee, shipping and what the item cost you — shows up here.</p>
+          <p class="empty-note" id="orders-empty">No sales logged yet. Your real profit per sale - after Depop's processing fee, shipping and what the item cost you - shows up here.</p>
         </div>
       </div>
     </section>
@@ -287,12 +287,12 @@
       <div class="panel-grid niche-grid">
         <div class="panel">
           <div class="panel-head"><h3>Launch checklist</h3><span class="muted sm" id="check-progress"></span></div>
-          <p class="muted sm">The workflow, in order. Tick things off as you go — it saves on this device.</p>
+          <p class="muted sm">The workflow, in order. Tick things off as you go - it saves on this device.</p>
           <div id="checklist"></div>
         </div>
         <div class="panel">
           <div class="panel-head"><h3>Niche scorecard</h3></div>
-          <p class="muted sm">Score a niche before you sink money into it. Be honest — a pretty score on a niche you can't source is worse than none.</p>
+          <p class="muted sm">Score a niche before you sink money into it. Be honest - a pretty score on a niche you can't source is worse than none.</p>
           <div class="form-grid">
             <label class="field span2"><span>Niche name</span><input id="ni-name" type="text" placeholder="90s workwear jackets" autocomplete="off"></label>
           </div>
@@ -314,14 +314,14 @@
         <div>
           <div class="panel">
             <div class="panel-head"><h3>Fees + currency</h3></div>
-            <p class="muted sm">Depop charges no selling fee in the US, UK and Australia — you only pay payment processing. Elsewhere a 10% selling fee still applies. Rates checked Sep 2026; confirm on Depop's help page if a number looks off.</p>
+            <p class="muted sm">Depop charges no selling fee in the US, UK and Australia - you only pay payment processing. Elsewhere a 10% selling fee still applies. Rates checked Sep 2026; confirm on Depop's help page if a number looks off.</p>
             <div class="form-grid">
               <label class="field"><span>Where you sell</span>
                 <select id="set-fee-preset">
-                  <option value="us">United States — 3.3% + $0.45</option>
-                  <option value="uk">United Kingdom — 2.9% + £0.30</option>
-                  <option value="au">Australia — 2.9% + A$0.30</option>
-                  <option value="row">Rest of world — 10% + processing</option>
+                  <option value="us">United States - 3.3% + $0.45</option>
+                  <option value="uk">United Kingdom - 2.9% + £0.30</option>
+                  <option value="au">Australia - 2.9% + A$0.30</option>
+                  <option value="row">Rest of world - 10% + processing</option>
                   <option value="custom">Custom rates</option>
                 </select>
               </label>
@@ -353,13 +353,13 @@
         <div class="panel">
           <div class="panel-head"><h3>Vault + privacy</h3></div>
           <div id="vault-setup">
-            <p class="muted sm">Right now nothing is stored when you close this tab. Set a passphrase and Flipside keeps your data on <strong>this device only</strong>, encrypted with AES-GCM — the same class of encryption banks use. The passphrase never leaves your browser, and there is no account to hack because there is no server.</p>
+            <p class="muted sm">Right now nothing is stored when you close this tab. Set a passphrase and Flipside keeps your data on <strong>this device only</strong>, encrypted with AES-GCM - the same class of encryption banks use. The passphrase never leaves your browser, and there is no account to hack because there is no server.</p>
             <div class="form-grid">
               <label class="field span2"><span>Passphrase</span><input id="set-pass-1" type="password" autocomplete="new-password" placeholder="at least 8 characters"></label>
               <label class="field span2"><span>Again</span><input id="set-pass-2" type="password" autocomplete="new-password" placeholder="same one more time"></label>
             </div>
             <div class="row-actions"><button class="btn primary" id="btn-set-pass" type="button">Start keeping my data</button></div>
-            <p class="fine muted">Forget the passphrase and the data is unrecoverable — that is the point of real encryption. Write it down somewhere safe.</p>
+            <p class="fine muted">Forget the passphrase and the data is unrecoverable - that is the point of real encryption. Write it down somewhere safe.</p>
           </div>
           <div id="vault-manage" hidden>
             <p class="muted sm">Your data is encrypted on this device with your passphrase. Flipside auto-locks after 10 minutes away from the page.</p>
@@ -371,7 +371,7 @@
           </div>
         </div>
       </div>
-      <p class="fine muted center" style="margin-top:26px">Flipside runs entirely in your browser. No accounts, no analytics, no server. It does not list, message or refresh anything on Depop for you — it prepares everything so listing takes minutes, and it shows what you actually keep.</p>
+      <p class="fine muted center" style="margin-top:26px">Flipside runs entirely in your browser. No accounts, no analytics, no server. It does not list, message or refresh anything on Depop for you - it prepares everything so listing takes minutes, and it shows what you actually keep.</p>
     </section>
   </main>
 
