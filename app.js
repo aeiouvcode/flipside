@@ -1,6 +1,6 @@
 'use strict';
 /* ============================================================
-   FLIPSIDE — local-first Depop seller workspace.
+   FLIPSIDE - local-first Depop seller workspace.
    No backend. No accounts. Data is session-only until the user
    sets a passphrase; then AES-GCM encrypted in localStorage.
    ============================================================ */
@@ -66,11 +66,11 @@ function passModal(title, body) {
 }
 
 async function copyText(txt, label) {
-  try { await navigator.clipboard.writeText(txt); toast((label || 'Copied') + ' — ready to paste into Depop'); }
+  try { await navigator.clipboard.writeText(txt); toast((label || 'Copied') + ' - ready to paste into Depop'); }
   catch (e) {
     const ta = document.createElement('textarea');
     ta.value = txt; document.body.appendChild(ta); ta.select();
-    try { document.execCommand('copy'); toast(label || 'Copied'); } catch (e2) { toast('Copy failed — select the text and copy it by hand'); }
+    try { document.execCommand('copy'); toast(label || 'Copied'); } catch (e2) { toast('Copy failed - select the text and copy it by hand'); }
     ta.remove();
   }
 }
@@ -127,7 +127,7 @@ function markDirty() {
 async function persist() {
   if (!PASS) { dirty = false; return; }
   try { await Vault.save(PASS, JSON.stringify(S)); dirty = false; }
-  catch (e) { console.error(e); toast('Could not save — encryption failed'); }
+  catch (e) { console.error(e); toast('Could not save - encryption failed'); }
 }
 window.addEventListener('beforeunload', () => {
   if (dirty && PASS) persist();
@@ -157,7 +157,7 @@ function orderMath(o) {
 
 /* ---------------- router ---------------- */
 const VIEWS = {
-  board:    ['Board', 'What you actually keep — today and this week.'],
+  board:    ['Board', 'What you actually keep - today and this week.'],
   listings: ['Listings', 'Draft Depop-ready titles, descriptions and hashtags.'],
   photos:   ['Photos', 'Square, clean, Depop-ready. Processed on this device.'],
   orders:   ['Orders', 'Every sale in, fees and shipping out, real profit left.'],
@@ -309,10 +309,10 @@ function drawGoal(todayProfit, goal) {
   if (goal > 0) {
     const left = goal - todayProfit;
     copy.innerHTML = left <= 0
-      ? '<b>Goal hit.</b><br>Today is paid for — everything from here is extra.'
+      ? '<b>Goal hit.</b><br>Today is paid for - everything from here is extra.'
       : '<b>' + esc(money(todayProfit)) + '</b> so far today.<br>' + esc(money(left)) + ' to go against your ' + esc(money(goal)) + ' goal.';
   } else {
-    copy.innerHTML = 'No daily goal set. Add one in Settings — even ' + esc(money(20)) + ' a day is ' + esc(money(600)) + ' a month.';
+    copy.innerHTML = 'No daily goal set. Add one in Settings - even ' + esc(money(20)) + ' a day is ' + esc(money(600)) + ' a month.';
   }
 }
 
@@ -365,7 +365,7 @@ function saveOrder() {
     toast('Sale updated');
   } else {
     S.orders.push(Object.assign({ id: uid() }, o));
-    toast('Sale logged — ' + money(orderMath(o).profit) + ' profit');
+    toast('Sale logged - ' + money(orderMath(o).profit) + ' profit');
   }
   prefillOrder('', '', '');
   markDirty(); renderOrders(); updateBadges();
@@ -407,7 +407,7 @@ function exportCSV() {
       .map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',');
   });
   download('flipside-sales.csv', [head].concat(lines).join('\n'), 'text/csv');
-  toast('CSV downloaded — opens in Sheets or Excel');
+  toast('CSV downloaded - opens in Sheets or Excel');
 }
 function download(name, content, type) {
   const blob = content instanceof Blob ? content : new Blob([content], { type: type || 'application/octet-stream' });
@@ -420,7 +420,7 @@ function download(name, content, type) {
 /* ---------------- listings ---------------- */
 const CATEGORIES = ['T-shirt','Shirt / top','Hoodie / sweatshirt','Jacket / coat','Jeans','Trousers','Shorts',
   'Dress','Skirt','Sneakers','Boots / shoes','Bag','Accessories','Vintage other','Other'];
-const CONDITIONS = ['New with tags','Like new','Used — excellent','Used — good','Used — fair','Distressed / repaired'];
+const CONDITIONS = ['New with tags','Like new','Used - excellent','Used - good','Used - fair','Distressed / repaired'];
 const CAT_TAGS = {
   'T-shirt':['#tee','#tshirt','#graphictee'], 'Shirt / top':['#shirt','#top'],
   'Hoodie / sweatshirt':['#hoodie','#sweatshirt','#streetwear'], 'Jacket / coat':['#jacket','#coat','#outerwear'],
@@ -517,12 +517,13 @@ function generateCopy() {
     ? f.name : brand + ' ' + f.name;
 
   // ---- title (Depop truncates around 80 chars)
-  let title = [desc, f.color, f.size ? '· size ' + f.size : '', f.era].filter(Boolean).join(' ');
+  let title = [desc, f.color, f.size ? '· size ' + f.size : '', f.era ? '· ' + f.era : ''].filter(Boolean).join(' ');
+  title = title.charAt(0).toUpperCase() + title.slice(1);
   if (title.length > 80) title = [desc, f.size ? '· ' + f.size : ''].filter(Boolean).join(' ');
   if (title.length > 80) title = title.slice(0, 79).trimEnd() + '…';
 
   // ---- condition line
-  const condLine = f.condition + (f.flaws ? ' — ' + f.flaws : (f.condition.startsWith('Used') ? ' — no flaws to note, check the photos' : ''));
+  const condLine = f.condition + (f.flaws ? ' · ' + f.flaws : (f.condition.startsWith('Used') ? ' · no flaws to note, check the photos' : ''));
 
   let body = '';
   if (tone === 'classic') {
@@ -532,7 +533,7 @@ function generateCopy() {
     if (f.size) body += '· Size: ' + f.size + '\n';
     if (f.measure) body += '· Measurements: ' + f.measure + '\n';
     body += '· Ships within 24–48h, tracked\n';
-    body += '· Open to reasonable offers — message me ♡\n';
+    body += '· Open to reasonable offers - message me ♡\n';
   } else if (tone === 'clean') {
     body += sentenceFor(f) + '\n\n';
     body += 'Condition: ' + condLine + '\n';
@@ -564,12 +565,12 @@ function generateCopy() {
 }
 function sentenceFor(f) {
   const bits = [];
-  const what = (f.brand ? f.brand + ' ' : '') + f.name;
+  const what = (f.brand && !f.name.toLowerCase().startsWith(f.brand.toLowerCase()) ? f.brand + ' ' : '') + f.name;
   if (f.era) bits.push('Genuine ' + f.era + ' ' + what);
   else bits.push(what.charAt(0).toUpperCase() + what.slice(1));
   let s = bits[0] + (f.color ? ' in ' + f.color : '') + '.';
   if (f.condition === 'New with tags') s += ' Brand new, tags still on.';
-  else if (f.condition === 'Like new') s += ' Worn once or twice at most — you would struggle to tell it from new.';
+  else if (f.condition === 'Like new') s += ' Worn once or twice at most - you would struggle to tell it from new.';
   return s + ' ';
 }
 function showGenerated(gen) {
@@ -630,7 +631,7 @@ const Photos = {
     $('#adj-sat').value = ph.adj.sat; $('#adj-sat').nextElementSibling.textContent = ph.adj.sat;
     $('#adj-warm').value = ph.adj.warm; $('#adj-warm').nextElementSibling.textContent = ph.adj.warm;
     $('#bg-tol').value = ph.tol; $('#bg-tol').nextElementSibling.textContent = ph.tol;
-    $('#canvas-hint').textContent = ph.mask ? 'Backdrop mask active — use the brush to touch it up.' : '';
+    $('#canvas-hint').textContent = ph.mask ? 'Backdrop mask active - use the brush to touch it up.' : '';
   },
   renderStrip() {
     const strip = $('#thumb-strip');
@@ -638,7 +639,7 @@ const Photos = {
     this.items.forEach(ph => {
       const im = document.createElement('img');
       im.src = ph.url; im.className = 'thumb' + (this.current && this.current.id === ph.id ? ' on' : '');
-      im.title = ph.name + ' — double-click to remove';
+      im.title = ph.name + ' - double-click to remove';
       im.onclick = () => this.select(ph.id);
       im.ondblclick = () => this.remove(ph.id);
       strip.appendChild(im);
@@ -764,10 +765,6 @@ const Photos = {
         const src = mask.slice();
         for (let y = 1; y < Sz - 1; y++) for (let x = 1; x < Sz - 1; x++) {
           const p = y * Sz + x;
-          if (src[p] === 0 || src[p] === 255) continue;
-        }
-        for (let y = 1; y < Sz - 1; y++) for (let x = 1; x < Sz - 1; x++) {
-          const p = y * Sz + x;
           const sum = src[p - Sz - 1] + src[p - Sz] + src[p - Sz + 1] + src[p - 1] + src[p] + src[p + 1] + src[p + Sz - 1] + src[p + Sz] + src[p + Sz + 1];
           mask[p] = sum / 9;
         }
@@ -775,7 +772,7 @@ const Photos = {
       ph.mask = mask;
       this.renderFromBase();
       this.syncTools();
-      toast('Backdrop removed — brush anything it missed');
+      toast('Backdrop removed - brush anything it missed');
     }, 30);
   },
   brushAt(clientX, clientY, mode) {
@@ -805,7 +802,14 @@ const Photos = {
       if (ph.mask) this.applyMask(id, ph.mask);
       bctx.putImageData(id, 0, 0);
       const fmt = $$('#fmt-seg button').find(b => b.classList.contains('on')).dataset.fmt;
-      base.toBlob(blob => {
+      let out = base;
+      if (fmt === 'jpeg' && ph.mask) {
+        out = document.createElement('canvas'); out.width = this.SZ; out.height = this.SZ;
+        const octx = out.getContext('2d');
+        octx.fillStyle = '#ffffff'; octx.fillRect(0, 0, this.SZ, this.SZ);
+        octx.drawImage(base, 0, 0);
+      }
+      out.toBlob(blob => {
         download(ph.name + '-flipside.' + (fmt === 'png' ? 'png' : 'jpg'), blob);
         resolve();
       }, fmt === 'png' ? 'image/png' : 'image/jpeg', 0.92);
@@ -828,13 +832,13 @@ const CHECK_PHASES = [
   ]},
   { name: 'Photograph', items: [
     ['Plain backdrop + daylight', 'A wall, a sheet, a clean floor. The Photos tab can strip a plain backdrop for you.'],
-    ['Shoot 4+ photos per item', 'Front, back, label/tag, and any flaw — buyers ask for these anyway.'],
+    ['Shoot 4+ photos per item', 'Front, back, label/tag, and any flaw - buyers ask for these anyway.'],
     ['Square-prep every photo here', 'Depop displays square. Fill-crop or blur-pad in the Photos tab.']
   ]},
   { name: 'List it', items: [
     ['Draft the listing in the Listings tab', 'Title, description and hashtags from the details you enter.'],
     ['Price from sold comps, not asking prices', 'Check 5+ sold listings and price inside that range.'],
-    ['Post when your buyers scroll', 'Evenings and weekends move youth fashion fastest — test and watch your own numbers.']
+    ['Post when your buyers scroll', 'Evenings and weekends move youth fashion fastest - test and watch your own numbers.']
   ]},
   { name: 'Ship + learn', items: [
     ['Know your shipping cost before you list', 'Weigh a packed item once. Guessing wrong eats your margin.'],
@@ -864,10 +868,10 @@ function nicheScore() {
   return Math.round(d * 3 + r * 2 + m * 2 + s * 2 + k * 1);
 }
 function nicheVerdict(score) {
-  if (score < 40) return 'Pass — the numbers do not back this one.';
-  if (score < 60) return 'Risky — it needs a clear angle or a cheaper source.';
-  if (score < 75) return 'Promising — start small and let sold items prove it.';
-  return 'Strong — go build stock before someone else does.';
+  if (score < 40) return 'Pass - the numbers do not back this one.';
+  if (score < 60) return 'Risky - it needs a clear angle or a cheaper source.';
+  if (score < 75) return 'Promising - start small and let sold items prove it.';
+  return 'Strong - go build stock before someone else does.';
 }
 function updateNicheScore() {
   const sc = nicheScore();
@@ -880,7 +884,7 @@ function renderNicheList() {
   wrap.innerHTML = items.map(n =>
     '<div class="card-item" style="cursor:default"><div class="t">' + esc(n.name) + '</div>' +
     '<div class="m"><span class="chip ' + (n.score >= 60 ? 'listed' : (n.score >= 40 ? 'draft' : 'sold')) + '">' + n.score + ' / 100</span>' +
-    '<span>' + esc(nicheVerdict(n.score).split('—')[0].trim()) + '</span>' +
+    '<span>' + esc(nicheVerdict(n.score).split(' - ')[0].trim()) + '</span>' +
     '<button class="icon-btn" data-niche-del="' + n.id + '" title="Delete" type="button" style="margin-left:auto"><svg viewBox="0 0 20 20"><path d="M4 6h12M8 6V4h4v2M6 6l1 10h6l1-10"/></svg></button></div></div>'
   ).join('') || '<p class="empty-note">No scorecards saved yet.</p>';
 }
@@ -896,7 +900,7 @@ function renderSettings() {
   $('#vault-setup').hidden = !!PASS || Vault.has();
   $('#vault-manage').hidden = !PASS && !Vault.has();
   $('#data-explainer').textContent = PASS
-    ? 'Backups download encrypted with your passphrase — safe to keep anywhere. Restoring needs the same passphrase.'
+    ? 'Backups download encrypted with your passphrase - safe to keep anywhere. Restoring needs the same passphrase.'
     : 'Session mode: this backup is a plain, readable JSON file. Anyone who opens it can read it. Set a passphrase first if you want backups encrypted.';
 }
 function applyFeePreset() {
@@ -952,7 +956,7 @@ async function importData(file) {
     toast('Backup restored');
   } catch (e) {
     console.error(e);
-    toast('That file did not restore — wrong passphrase or not a Flipside backup');
+    toast('That file did not restore - wrong passphrase or not a Flipside backup');
   }
 }
 
@@ -1007,10 +1011,10 @@ function loadSample() {
   ];
   S.listings = [
     { id: uid(), status: 'listed', updated: Date.now(), name: 'Stussy 8-ball fleece', brand: 'Stussy',
-      category: 'Hoodie / sweatshirt', size: 'L', color: 'washed black', condition: 'Used — excellent',
+      category: 'Hoodie / sweatshirt', size: 'L', color: 'washed black', condition: 'Used - excellent',
       era: '', flaws: '', measure: 'pit to pit 24in, length 27in', tags: ['streetwear', 'fleece'], cost: 12, price: 55 },
     { id: uid(), status: 'draft', updated: Date.now() - 3600e3, name: 'Harley davidson tee', brand: 'Harley Davidson',
-      category: 'T-shirt', size: 'M', color: 'faded grey', condition: 'Used — good',
+      category: 'T-shirt', size: 'M', color: 'faded grey', condition: 'Used - good',
       era: '90s', flaws: 'light fade throughout, single stitch', measure: 'pit to pit 20in', tags: ['vintage', '90s', 'americana'], cost: 4, price: 26 }
   ];
   S.niches = [{ id: uid(), name: '90s workwear jackets', score: 78, created: Date.now() }];
@@ -1018,7 +1022,7 @@ function loadSample() {
   S.sample = true;
   markDirty();
   route();
-  toast('Sample data loaded — wipe it any time in Settings');
+  toast('Sample data loaded - wipe it any time in Settings');
 }
 
 /* ---------------- wiring ---------------- */
@@ -1037,7 +1041,7 @@ function wire() {
       PASS = pass;
       $('#gate-pass').value = '';
       enterApp();
-      toast('Unlocked — welcome back');
+      toast('Unlocked - welcome back');
     } catch (e) {
       $('#gate-error').textContent = 'That passphrase did not open the vault. Try again.';
     }
@@ -1046,7 +1050,7 @@ function wire() {
 
   // lock buttons
   ['#btn-lock-side', '#btn-lock-top', '#btn-lock-now'].forEach(sel => $(sel).onclick = () => {
-    if (!PASS) { toast('Session mode — nothing to lock. Set a passphrase in Settings.'); return; }
+    if (!PASS) { toast('Session mode - nothing to lock. Set a passphrase in Settings.'); return; }
     lockNow(); toast('Locked');
   });
 
@@ -1070,14 +1074,14 @@ function wire() {
     const t = $('#out-title').textContent + '\n\n' + $('#out-desc').textContent + '\n' + $('#out-tags').textContent;
     copyText(t, 'Whole listing copied');
   };
-  $('#btn-mark-listed').onclick = () => { if (!currentListing) return; saveCurrentListing(true); currentListing.status = 'listed'; markDirty(); renderListingList(); toast('Marked as listed — nice'); };
+  $('#btn-mark-listed').onclick = () => { if (!currentListing) return; saveCurrentListing(true); currentListing.status = 'listed'; markDirty(); renderListingList(); toast('Marked as listed - nice'); };
   $('#btn-mark-sold').onclick = () => {
     if (!currentListing) return;
     saveCurrentListing(true);
     currentListing.status = 'sold'; markDirty(); renderListingList();
     prefillOrder(currentListing.name, currentListing.price || '', currentListing.cost || '');
     location.hash = '#/orders';
-    toast('Marked sold — finish logging the sale');
+    toast('Marked sold - finish logging the sale');
   };
   $('#btn-del-listing').onclick = async () => {
     if (!currentListing) return;
@@ -1099,13 +1103,15 @@ function wire() {
   ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
   dz.addEventListener('drop', e => Photos.add(e.dataTransfer.files));
   $$('#fit-seg button').forEach(b => b.onclick = () => {
-    Photos.current.fit = b.dataset.fit;
+    const ph = Photos.current;
+    ph.fit = b.dataset.fit;
+    if (ph.mask) { ph.mask = null; toast('Framing changed - backdrop mask reset'); }
     $('#pad-color-row').hidden = b.dataset.fit !== 'color';
     $$('#fit-seg button').forEach(x => x.classList.toggle('on', x === b));
-    Photos.render();
+    Photos.render(); Photos.syncTools();
   });
   $('#pad-color').oninput = e => { Photos.current.padColor = e.target.value; Photos.render(); };
-  $('#btn-rotate').onclick = () => { const ph = Photos.current; ph.rot = (ph.rot + 1) % 4; ph.mask = null; Photos.render(); Photos.syncTools(); toast('Rotated — backdrop mask reset'); };
+  $('#btn-rotate').onclick = () => { const ph = Photos.current; ph.rot = (ph.rot + 1) % 4; ph.mask = null; Photos.render(); Photos.syncTools(); toast('Rotated - backdrop mask reset'); };
   const adjBind = (sel, key) => {
     $(sel).addEventListener('input', e => {
       const v = num(e.target.value);
@@ -1131,7 +1137,7 @@ function wire() {
   ecv.addEventListener('pointermove', e => { if (brushing && brushMode !== 'off') Photos.brushAt(e.clientX, e.clientY, brushMode); });
   ['pointerup', 'pointercancel'].forEach(ev => ecv.addEventListener(ev, () => { brushing = false; }));
   $$('#fmt-seg button').forEach(b => b.onclick = () => $$('#fmt-seg button').forEach(x => x.classList.toggle('on', x === b)));
-  $('#btn-export').onclick = () => { if (Photos.current) Photos.exportOne(Photos.current).then(() => toast('Downloaded — Depop-ready square')); };
+  $('#btn-export').onclick = () => { if (Photos.current) Photos.exportOne(Photos.current).then(() => toast('Downloaded - Depop-ready square')); };
   $('#btn-export-all').onclick = async () => {
     if (!Photos.items.length) return;
     $('#export-status').textContent = 'Preparing ' + Photos.items.length + ' photos…';
@@ -1209,7 +1215,7 @@ function wire() {
     await persist();
     $('#set-pass-1').value = ''; $('#set-pass-2').value = '';
     updateVaultChips(); renderSettings(); bumpLockTimer();
-    toast('Vault on — your data now stays on this device, encrypted');
+    toast('Vault on - your data now stays on this device, encrypted');
   };
   $('#btn-change-pass').onclick = async () => {
     const p = await passModal('Change passphrase', 'Your data will be re-encrypted with the new passphrase.');
@@ -1227,7 +1233,7 @@ function wire() {
   $('#btn-import-data').onclick = () => $('#import-file').click();
   $('#import-file').addEventListener('change', e => { if (e.target.files[0]) importData(e.target.files[0]); e.target.value = ''; });
   $('#btn-wipe').onclick = async () => {
-    const ok = await confirmModal('Wipe everything?', 'Every listing, sale, scorecard and tick is gone' + (S.sample ? ' — including the sample data' : '') + '. There is no undo.', 'Wipe it all', true);
+    const ok = await confirmModal('Wipe everything?', 'Every listing, sale, scorecard and tick is gone' + (S.sample ? ' - including the sample data' : '') + '. There is no undo.', 'Wipe it all', true);
     if (!ok) return;
     Vault.clear();
     lockNow();
