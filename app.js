@@ -433,6 +433,14 @@ const AESTHETIC_TAGS = ['#depop','#depopseller','#depopfashion','#vintage','#thr
   '#sustainablefashion','#y2k','#90s','#streetwear','#preloved','#vintagestyle'];
 
 let currentListing = null;
+function normCondition(c) {
+  if (!c) return CONDITIONS[0];
+  c = String(c).replace(/\u2014|\u2013/g, '-');
+  return CONDITIONS.includes(c) ? c : CONDITIONS[0];
+}
+function migrateState() {
+  S.listings.forEach(l => { l.condition = normCondition(l.condition); });
+}
 
 function initListingSelects() {
   $('#li-category').innerHTML = CATEGORIES.map(c => '<option>' + esc(c) + '</option>').join('');
@@ -442,7 +450,7 @@ function listingFromForm() {
   return {
     name: $('#li-name').value.trim(), brand: $('#li-brand').value.trim(),
     category: $('#li-category').value, size: $('#li-size').value.trim(),
-    color: $('#li-color').value.trim(), condition: $('#li-condition').value,
+    color: $('#li-color').value.trim(), condition: normCondition($('#li-condition').value),
     era: $('#li-era').value.trim(), flaws: $('#li-flaws').value.trim(),
     measure: $('#li-measure').value.trim(),
     tags: $('#li-tags').value.split(',').map(t => t.trim()).filter(Boolean),
@@ -453,7 +461,7 @@ function fillListingForm(l) {
   $('#li-name').value = l.name || ''; $('#li-brand').value = l.brand || '';
   $('#li-category').value = l.category || CATEGORIES[0];
   $('#li-size').value = l.size || ''; $('#li-color').value = l.color || '';
-  $('#li-condition').value = l.condition || CONDITIONS[0];
+  $('#li-condition').value = normCondition(l.condition);
   $('#li-era').value = l.era || ''; $('#li-flaws').value = l.flaws || '';
   $('#li-measure').value = l.measure || ''; $('#li-tags').value = (l.tags || []).join(', ');
   $('#li-cost').value = l.cost || ''; $('#li-price').value = l.price || '';
@@ -951,6 +959,7 @@ async function importData(file) {
     }
     if (!data || !Array.isArray(data.orders)) throw new Error('bad file');
     S = Object.assign(Blank(), data);
+    migrateState();
     markDirty();
     route();
     toast('Backup restored');
@@ -986,6 +995,7 @@ function showGate() {
   if (hasVault) setTimeout(() => $('#gate-pass').focus(), 50);
 }
 async function enterApp() {
+  migrateState();
   $('#gate').hidden = true;
   $('#app').hidden = false;
   updateVaultChips();
